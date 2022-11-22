@@ -1,2 +1,3 @@
-# geolocation-deep-learning
-Deep Learning For Image-Based Self-Localization
+# Deep Learning For Image-Based Self-Localization
+
+MSc Thesis
