@@ -39,7 +39,7 @@ def plot_accuracy(model_history, epochs):
     plt.show()
 
 
-def plot_ljubljana(points, N):
+def plot_ljubljana(points, point_scores, actual, N):
     bounds = (
         14.464685451682861,
         14.543838918732977,
@@ -55,7 +55,7 @@ def plot_ljubljana(points, N):
 
     N = 8
 
-    dx = (bounds[1] - bounds[0]) / N
+    dx = (bounds[1] - bounds[0]) / 8
     x = dx + bounds[0]
     for _ in range(N - 1):
         ax.axvline(x=x, color="b", alpha=0.3)
@@ -67,10 +67,9 @@ def plot_ljubljana(points, N):
         ax.axhline(y=y, color="b", alpha=0.3)
         y += dy
 
-    for point in points:
-        x_str, y_str = point.split("-")
-        x = int(x_str)
-        y = int(y_str)
+    for i in range(len(points)):
+        y = int(points[i]) // 10
+        x = int(points[i]) % 10
 
         rect = patches.Rectangle(
             (bounds[0] + x * dx, bounds[2] + y * dy),
@@ -78,11 +77,29 @@ def plot_ljubljana(points, N):
             dy,
             linewidth=1,
             edgecolor="r",
-            facecolor="none",
+            facecolor="r",
+            alpha=point_scores[i],
         )
+
         ax.add_patch(rect)
+
+        rect = patches.Rectangle(
+            (bounds[0] + int(actual["class"].split("-")[1]) * dx, bounds[2] + int(actual["class"].split("-")[0]) * dy),
+            dx,
+            dy,
+            linewidth=1,
+            edgecolor="b",
+            facecolor="b",
+            alpha=point_scores[i],
+        )
+        ax.scatter(float(actual["x"]), float(actual["y"]), c="b", zorder=1, alpha=1, s=5)
+
+        ax.add_patch(rect) 
         ax.text(
-            bounds[0] + x * dx + dx / 2, bounds[2] + y * dy + dy / 2, point, color="r"
+            bounds[0] + x * dx + dx / 2,
+            bounds[2] + y * dy + dy / 2,
+            points[i],
+            color="r",
         )
 
     ax.imshow(lj, zorder=0, extent=bounds, aspect="equal")
@@ -121,6 +138,7 @@ def plot_dataset(folder):
     ax.scatter(y, x, c="r", zorder=1, alpha=0.2, s=5)
     ax.imshow(lj, zorder=0, extent=bounds, aspect="equal")
 
+
 def plot_point_and_class(point):
     bounds = (
         14.464685451682861,
@@ -128,13 +146,13 @@ def plot_point_and_class(point):
         46.02095210929212,
         46.09861511084722,
     )
-    
+
     N = 8
     x_dif = bounds[1] - bounds[0]
     y_dif = bounds[3] - bounds[2]
     x_width = x_dif / N
     y_width = y_dif / N
-        
+
     def class_mapper(label):
         coords = label.split(",")
         lat = float(coords[0])
